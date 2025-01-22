@@ -45,9 +45,12 @@ export async function POST(request) {
         
         let visualData;
         try {
+          console.log('Raw visual data response:', visualDataText);
           visualData = cleanJsonResponse(visualDataText);
+          console.log('Parsed visual data:', visualData);
         } catch (error) {
-          console.error('Failed to parse visual data:', error);
+          console.error('Failed to parse visual data. Raw response:', visualDataText);
+          console.error('Parse error:', error);
           // Provide fallback data if parsing fails
           visualData = {
             overallScore: 7.5,
@@ -240,9 +243,11 @@ const analysisPrompt = `Provide an extensive and detailed evaluation of the foll
 Analyze this idea: `;
 
 // Visual data prompt template
-const visualDataPrompt = `Based on the following business idea, provide numerical data for visualization in JSON format. The response should be ONLY valid JSON, nothing else. Do not include markdown code block syntax or any other text.
+const visualDataPrompt = `You are a data analysis tool. Your task is to analyze the following business idea and provide numerical data for visualization. 
 
-Analyze this idea and return data in this exact format:
+IMPORTANT: Your response must be ONLY valid JSON data. Do not include any explanatory text, markdown formatting, or code blocks. The response should start with { and end with }.
+
+Here is the exact format required (replace the example values with appropriate values based on the idea):
 {
   "overallScore": 8.5,
   "categoryScores": {

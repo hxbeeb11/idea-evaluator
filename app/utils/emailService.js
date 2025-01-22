@@ -62,138 +62,150 @@ function formatAnalysis(analysis) {
 }
 
 function generateCharts(visualData) {
+  console.log('Generating charts with visual data:', visualData);
   const charts = [];
   
-  // Category Scores Radar Chart
-  const categoryScoresChart = new QuickChart();
-  categoryScoresChart.setConfig({
-    type: 'radar',
-    data: {
-      labels: Object.keys(visualData.categoryScores).map(key => 
-        key.replace(/([A-Z])/g, ' $1').trim() // Add spaces before capital letters
-      ),
-      datasets: [{
-        label: 'Category Scores',
-        data: Object.values(visualData.categoryScores),
-        backgroundColor: 'rgba(26, 188, 156, 0.2)',
-        borderColor: 'rgba(26, 188, 156, 1)',
-        pointBackgroundColor: 'rgba(26, 188, 156, 1)'
-      }]
-    },
-    options: {
-      scale: {
-        ticks: { beginAtZero: true, max: 10 }
+  try {
+    // Category Scores Radar Chart
+    const categoryScoresChart = new QuickChart();
+    categoryScoresChart.setConfig({
+      type: 'radar',
+      data: {
+        labels: Object.keys(visualData.categoryScores).map(key => 
+          key.replace(/([A-Z])/g, ' $1').trim() // Add spaces before capital letters
+        ),
+        datasets: [{
+          label: 'Category Scores',
+          data: Object.values(visualData.categoryScores),
+          backgroundColor: 'rgba(26, 188, 156, 0.2)',
+          borderColor: 'rgba(26, 188, 156, 1)',
+          pointBackgroundColor: 'rgba(26, 188, 156, 1)'
+        }]
       },
-      plugins: {
-        title: {
-          display: true,
-          text: 'Category Performance Analysis'
+      options: {
+        scale: {
+          ticks: { beginAtZero: true, max: 10 }
+        },
+        plugins: {
+          title: {
+            display: true,
+            text: 'Category Performance Analysis'
+          }
         }
       }
-    }
-  });
+    });
 
-  // Market Analysis Bar Chart
-  const marketAnalysisChart = new QuickChart();
-  marketAnalysisChart.setConfig({
-    type: 'bar',
-    data: {
-      labels: ['Current Market Size', 'Projected Growth', 'Competition Level'],
-      datasets: [{
-        label: 'Market Analysis',
-        data: Object.values(visualData.marketAnalysis),
-        backgroundColor: 'rgba(26, 188, 156, 0.6)'
-      }]
-    },
-    options: {
-      scales: {
-        y: { beginAtZero: true, max: 100 }
+    // Market Analysis Bar Chart
+    const marketAnalysisChart = new QuickChart();
+    marketAnalysisChart.setConfig({
+      type: 'bar',
+      data: {
+        labels: ['Current Market Size', 'Projected Growth', 'Competition Level'],
+        datasets: [{
+          label: 'Market Analysis',
+          data: Object.values(visualData.marketAnalysis),
+          backgroundColor: 'rgba(26, 188, 156, 0.6)'
+        }]
       },
-      plugins: {
-        title: {
-          display: true,
-          text: 'Market Analysis Overview'
+      options: {
+        scales: {
+          y: { beginAtZero: true, max: 100 }
+        },
+        plugins: {
+          title: {
+            display: true,
+            text: 'Market Analysis Overview'
+          }
         }
       }
-    }
-  });
+    });
 
-  // Implementation Timeline Doughnut Chart
-  const timelineChart = new QuickChart();
-  timelineChart.setConfig({
-    type: 'doughnut',
-    data: {
-      labels: Object.keys(visualData.implementationTimeline).map(key => 
-        key.charAt(0).toUpperCase() + key.slice(1)
-      ),
-      datasets: [{
-        data: Object.values(visualData.implementationTimeline),
-        backgroundColor: [
-          'rgba(26, 188, 156, 0.8)',
-          'rgba(46, 204, 113, 0.8)',
-          'rgba(52, 152, 219, 0.8)',
-          'rgba(155, 89, 182, 0.8)'
-        ]
-      }]
-    },
-    options: {
-      plugins: {
-        title: {
-          display: true,
-          text: 'Implementation Timeline'
-        }
-      }
-    }
-  });
-
-  // Revenue Projection Line Chart
-  const revenueChart = new QuickChart();
-  revenueChart.setConfig({
-    type: 'line',
-    data: {
-      labels: Object.keys(visualData.revenueProjection).map(year => year.replace('year', 'Year ')),
-      datasets: [{
-        label: 'Projected Revenue',
-        data: Object.values(visualData.revenueProjection),
-        borderColor: 'rgba(26, 188, 156, 1)',
-        backgroundColor: 'rgba(26, 188, 156, 0.1)',
-        fill: true
-      }]
-    },
-    options: {
-      scales: {
-        y: { beginAtZero: true }
+    // Implementation Timeline Doughnut Chart
+    const timelineChart = new QuickChart();
+    timelineChart.setConfig({
+      type: 'doughnut',
+      data: {
+        labels: Object.keys(visualData.implementationTimeline).map(key => 
+          key.charAt(0).toUpperCase() + key.slice(1)
+        ),
+        datasets: [{
+          data: Object.values(visualData.implementationTimeline),
+          backgroundColor: [
+            'rgba(26, 188, 156, 0.8)',
+            'rgba(46, 204, 113, 0.8)',
+            'rgba(52, 152, 219, 0.8)',
+            'rgba(155, 89, 182, 0.8)'
+          ]
+        }]
       },
-      plugins: {
-        title: {
-          display: true,
-          text: '5-Year Revenue Projection'
+      options: {
+        plugins: {
+          title: {
+            display: true,
+            text: 'Implementation Timeline'
+          }
         }
       }
-    }
-  });
+    });
 
-  // Set width and height for all charts
-  [categoryScoresChart, marketAnalysisChart, timelineChart, revenueChart].forEach(chart => {
-    chart.setWidth(400);
-    chart.setHeight(300);
-    chart.setBackgroundColor('white');
-  });
+    // Revenue Projection Line Chart
+    const revenueChart = new QuickChart();
+    revenueChart.setConfig({
+      type: 'line',
+      data: {
+        labels: Object.keys(visualData.revenueProjection).map(year => year.replace('year', 'Year ')),
+        datasets: [{
+          label: 'Projected Revenue',
+          data: Object.values(visualData.revenueProjection),
+          borderColor: 'rgba(26, 188, 156, 1)',
+          backgroundColor: 'rgba(26, 188, 156, 0.1)',
+          fill: true
+        }]
+      },
+      options: {
+        scales: {
+          y: { beginAtZero: true }
+        },
+        plugins: {
+          title: {
+            display: true,
+            text: '5-Year Revenue Projection'
+          }
+        }
+      }
+    });
 
-  return {
-    categoryScores: categoryScoresChart.getUrl(),
-    marketAnalysis: marketAnalysisChart.getUrl(),
-    timeline: timelineChart.getUrl(),
-    revenue: revenueChart.getUrl()
-  };
+    // Set width and height for all charts
+    [categoryScoresChart, marketAnalysisChart, timelineChart, revenueChart].forEach(chart => {
+      chart.setWidth(400);
+      chart.setHeight(300);
+      chart.setBackgroundColor('white');
+    });
+
+    const chartUrls = {
+      categoryScores: categoryScoresChart.getUrl(),
+      marketAnalysis: marketAnalysisChart.getUrl(),
+      timeline: timelineChart.getUrl(),
+      revenue: revenueChart.getUrl()
+    };
+
+    console.log('Generated chart URLs:', chartUrls);
+    return chartUrls;
+
+  } catch (error) {
+    console.error('Error generating charts:', error);
+    throw new Error('Failed to generate charts: ' + error.message);
+  }
 }
 
 export async function sendAnalysisEmail(email, analysis, visualData) {
   try {
     console.log('Starting email send process...'); 
     console.log('Email recipient:', email);
+    console.log('Visual data for charts:', visualData);
 
     const charts = generateCharts(visualData);
+    console.log('Charts generated successfully');
 
     // Create sections with embedded charts
     const analysisWithCharts = analysis
@@ -249,6 +261,8 @@ $1`
 $1`
       );
 
+    console.log('Analysis with charts prepared');
+
     const mailOptions = {
       from: process.env.GMAIL_USER,
       to: email,
@@ -270,9 +284,9 @@ $1`
       `
     };
 
-    console.log('Attempting to send email...');
+    console.log('Attempting to send email with charts...');
     const result = await transporter.sendMail(mailOptions);
-    console.log('Email sent successfully');
+    console.log('Email sent successfully with charts');
     return result;
   } catch (error) {
     console.error('Email send error:', error);
