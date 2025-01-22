@@ -61,9 +61,9 @@ export default function LandingPage() {
     <div className="relative min-h-screen">
       <ParticleBackground />
       <div className="relative z-10">
-        <div className="h-screen overflow-hidden flex flex-col">
+        <div className="md:h-screen md:overflow-hidden flex flex-col">
           {/* Hero Section */}
-          <div className="flex-1 container mx-auto px-4 flex flex-col items-center justify-center">
+          <div className="flex-1 container mx-auto px-4 py-12 md:py-0 flex flex-col items-center justify-center">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -114,7 +114,7 @@ export default function LandingPage() {
             </motion.div>
 
             {/* Features Section */}
-            <div className="grid md:grid-cols-3 gap-8 mt-12">
+            <div className="grid md:grid-cols-3 gap-8 mt-12 mb-12">
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
