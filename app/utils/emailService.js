@@ -1,5 +1,4 @@
 import nodemailer from 'nodemailer';
-import QuickChart from 'quickchart-js';
 
 const transporter = nodemailer.createTransport({
   service: 'gmail',
@@ -75,16 +74,17 @@ function formatAnalysis(analysis) {
 
 function generateCharts(visualData) {
   console.log('Generating charts with visual data:', visualData);
-  const charts = [];
   
   try {
+    // Base URL for QuickChart API
+    const baseUrl = 'https://quickchart.io/chart';
+    
     // Category Scores Radar Chart
-    const categoryScoresChart = new QuickChart();
-    categoryScoresChart.setConfig({
+    const categoryScoresConfig = {
       type: 'radar',
       data: {
         labels: Object.keys(visualData.categoryScores).map(key => 
-          key.replace(/([A-Z])/g, ' $1').trim() // Add spaces before capital letters
+          key.replace(/([A-Z])/g, ' $1').trim()
         ),
         datasets: [{
           label: 'Category Scores',
@@ -105,11 +105,10 @@ function generateCharts(visualData) {
           }
         }
       }
-    });
+    };
 
     // Market Analysis Bar Chart
-    const marketAnalysisChart = new QuickChart();
-    marketAnalysisChart.setConfig({
+    const marketAnalysisConfig = {
       type: 'bar',
       data: {
         labels: ['Current Market Size', 'Projected Growth', 'Competition Level'],
@@ -130,11 +129,10 @@ function generateCharts(visualData) {
           }
         }
       }
-    });
+    };
 
     // Implementation Timeline Doughnut Chart
-    const timelineChart = new QuickChart();
-    timelineChart.setConfig({
+    const timelineConfig = {
       type: 'doughnut',
       data: {
         labels: Object.keys(visualData.implementationTimeline).map(key => 
@@ -158,11 +156,10 @@ function generateCharts(visualData) {
           }
         }
       }
-    });
+    };
 
     // Revenue Projection Line Chart
-    const revenueChart = new QuickChart();
-    revenueChart.setConfig({
+    const revenueConfig = {
       type: 'line',
       data: {
         labels: Object.keys(visualData.revenueProjection).map(year => year.replace('year', 'Year ')),
@@ -185,20 +182,14 @@ function generateCharts(visualData) {
           }
         }
       }
-    });
+    };
 
-    // Set width and height for all charts
-    [categoryScoresChart, marketAnalysisChart, timelineChart, revenueChart].forEach(chart => {
-      chart.setWidth(400);
-      chart.setHeight(300);
-      chart.setBackgroundColor('white');
-    });
-
+    // Generate chart URLs
     const chartUrls = {
-      categoryScores: categoryScoresChart.getUrl(),
-      marketAnalysis: marketAnalysisChart.getUrl(),
-      timeline: timelineChart.getUrl(),
-      revenue: revenueChart.getUrl()
+      categoryScores: `${baseUrl}?c=${encodeURIComponent(JSON.stringify(categoryScoresConfig))}&w=400&h=300&bkg=white`,
+      marketAnalysis: `${baseUrl}?c=${encodeURIComponent(JSON.stringify(marketAnalysisConfig))}&w=400&h=300&bkg=white`,
+      timeline: `${baseUrl}?c=${encodeURIComponent(JSON.stringify(timelineConfig))}&w=400&h=300&bkg=white`,
+      revenue: `${baseUrl}?c=${encodeURIComponent(JSON.stringify(revenueConfig))}&w=400&h=300&bkg=white`
     };
 
     console.log('Generated chart URLs:', chartUrls);
@@ -214,8 +205,8 @@ export async function sendAnalysisEmail(email, analysis, visualData) {
   try {
     console.log('Starting email send process...'); 
     console.log('Email recipient:', email);
-    console.log('Analysis length:', analysis.length);  // Add this log
-    console.log('Analysis end:', analysis.slice(-200));  // Add this to see the end of analysis
+    console.log('Analysis length:', analysis.length);
+    console.log('Analysis end:', analysis.slice(-200));
 
     const charts = generateCharts(visualData);
     console.log('Charts generated successfully');
@@ -243,70 +234,44 @@ export async function sendAnalysisEmail(email, analysis, visualData) {
         `$1\n\n## Revenue Projection\n<div style="margin: 20px 0; text-align: center;">\n  <img src="${charts.revenue}" alt="Revenue Projection" style="max-width: 100%; height: auto; margin: 15px auto; display: block;">\n  <p style="color: #666; font-size: 14px;">5-year revenue projection trend</p>\n</div>\n`
       );
 
-    // Ensure all sections are present in the final analysis
-    const sections = [
-      "1. Project Overview",
-      "2. Technical Requirements",
-      "3. Market Analysis",
-      "4. Financial Analysis",
-      "5. Implementation Challenges",
-      "6. Marketing Strategy",
-      "7. Growth & Scaling Strategy",
-      "8. Overall Score"
-    ];
+    // Format the analysis with HTML styling
+    const formattedAnalysis = formatAnalysis(analysisWithCharts);
 
-    let finalAnalysis = analysisWithCharts;
-    for (let i = 0; i < sections.length; i++) {
-      const currentSection = sections[i];
-      const nextSection = sections[i + 1];
-      
-      if (!finalAnalysis.includes(`# ${currentSection}`)) {
-        console.warn(`Missing section: ${currentSection}`);
-      }
-      
-      // Check if charts are properly placed
-      if (currentSection === "1. Project Overview" && !finalAnalysis.includes("Category Performance Overview")) {
-        console.warn("Category Performance chart may be missing");
-      } else if (currentSection === "3. Market Analysis" && !finalAnalysis.includes("Market Overview")) {
-        console.warn("Market Analysis chart may be missing");
-      } else if (currentSection === "4. Financial Analysis" && !finalAnalysis.includes("Revenue Projection")) {
-        console.warn("Revenue Projection chart may be missing");
-      } else if (currentSection === "5. Implementation Challenges" && !finalAnalysis.includes("Implementation Timeline")) {
-        console.warn("Implementation Timeline chart may be missing");
-      }
-    }
+    // Create email HTML template
+    const emailHtml = `
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <meta charset="utf-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>Idea Evaluation Report</title>
+        </head>
+        <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 800px; margin: 0 auto; padding: 20px;">
+          <div style="background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 30px;">
+            <h1 style="color: #2C3E50; margin-bottom: 10px;">Your Idea Evaluation Report</h1>
+            <p style="color: #666;">Thank you for using our idea evaluation service. Below is a detailed analysis of your idea.</p>
+          </div>
+          ${formattedAnalysis}
+          <div style="margin-top: 40px; padding-top: 20px; border-top: 2px solid #ECF0F1; color: #666; font-size: 14px;">
+            <p>This report was generated by our AI-powered evaluation system. For any questions or feedback, please contact us.</p>
+          </div>
+        </body>
+      </html>
+    `;
 
-    console.log('Analysis with charts prepared');
-    console.log('Final analysis length:', finalAnalysis.length);
-    console.log('Final analysis end:', finalAnalysis.slice(-200));
-
-    const mailOptions = {
+    // Send email
+    const info = await transporter.sendMail({
       from: process.env.GMAIL_USER,
       to: email,
-      subject: 'Your Idea Evaluation Results',
-      html: `
-        <div style="font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; background-color: #ffffff;">
-          <h1 style="color: #2C3E50; font-size: 28px; margin-bottom: 24px; text-align: center;">Your Idea Evaluation Results</h1>
-          
-          <div style="background-color: #f8f9fa; padding: 30px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-            ${formatAnalysis(finalAnalysis)}
-          </div>
+      subject: 'Your Idea Evaluation Report',
+      html: emailHtml
+    });
 
-          <div style="margin-top: 24px; padding: 16px; background-color: #e9ecef; border-radius: 6px; text-align: center;">
-            <p style="color: #666; margin: 0;">
-              This analysis was generated by AI. Please use it as a starting point for your research.
-            </p>
-          </div>
-        </div>
-      `
-    };
+    console.log('Email sent successfully:', info);
+    return info;
 
-    console.log('Attempting to send email with charts...');
-    const result = await transporter.sendMail(mailOptions);
-    console.log('Email sent successfully with charts');
-    return result;
   } catch (error) {
-    console.error('Email send error:', error);
+    console.error('Error in sendAnalysisEmail:', error);
     throw error;
   }
 }
