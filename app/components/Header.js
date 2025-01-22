@@ -7,10 +7,10 @@ import Navbar from './Navbar'
 
 export default function Header() {
     return (
-      <header className="bg-[#1a237e] text-white py-4">
+      <header className="bg-[#1a237e] text-white py-4 relative z-50">
         <div className="container mx-auto px-4">
           <div className="flex justify-between items-center">
-            <Link href="/" className="group flex items-center gap-2 transition-colors duration-200">
+            <Link href="/home" className="group flex items-center gap-2 transition-colors duration-200">
               <motion.div
                 initial={{ rotate: -20 }}
                 animate={{ rotate: 0 }}

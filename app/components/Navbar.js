@@ -3,12 +3,17 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { motion } from 'framer-motion'
-import { InformationCircleIcon, EnvelopeIcon } from '@heroicons/react/24/solid'
+import { InformationCircleIcon, EnvelopeIcon, HomeIcon } from '@heroicons/react/24/solid'
 
 export default function Navbar() {
   const pathname = usePathname()
 
   const navItems = [
+    {
+      path: '/',
+      label: 'Landing',
+      icon: HomeIcon,
+    },
     {
       path: '/about',
       label: 'About',

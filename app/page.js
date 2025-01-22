@@ -1,129 +1,162 @@
-"use client"
+'use client';
 
-import { useState } from "react"
-import useFormValidation from "./hooks/useFormValidation"
-import ParticleBackground from "./components/ParticleBackground"
-import { motion } from "framer-motion"
-import { AnimatedInput, AnimatedTextarea, AnimatedButton } from "./components/AnimatedFormElements"
+import Link from "next/link"
+import { FaRocket, FaChartLine, FaBrain, FaQuoteLeft } from 'react-icons/fa'
+import { motion } from 'framer-motion'
+import ParticleBackground from './components/ParticleBackground'
 
-export default function Home() {
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [notification, setNotification] = useState(null)
-  const { values, errors, handleChange, isValid } = useFormValidation({
-    email: "",
-    idea: "",
-  })
-  const [analysis, setAnalysis] = useState(null)
-
-  const handleSubmit = async (e) => {
-    e.preventDefault()
-    setIsSubmitting(true)
-    setNotification(null)
-
-    try {
-      console.log('Submitting form with:', { email: values.email, idea: values.idea });  // Debug log
-      
-      const response = await fetch('/api/evaluate', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          email: values.email,
-          idea: values.idea,
-        }),
-      });
-
-      console.log('Response received:', response.status);  // Debug log
-      
-      const data = await response.json();
-      console.log('Response data:', data);  // Debug log
-
-      if (data.success) {
-        setAnalysis(null);
-        setNotification({
-          type: "success",
-          message: "Analysis complete! A comprehensive evaluation of your idea has been sent to your email. Please check your inbox for detailed analytical results and recommendations.",
-        });
-      } else {
-        throw new Error(data.error);
-      }
-    } catch (error) {
-      console.error('Error in submission:', error);  // Debug log
-      setNotification({
-        type: "error",
-        message: "Error processing your request. Please try again.",
-      });
-    } finally {
-      setIsSubmitting(false);
-    }
+const quotes = [
+  {
+    text: "Ideas are the beginning points of all fortunes.",
+    author: "Napoleon Hill"
+  },
+  {
+    text: "The best way to predict the future is to create it.",
+    author: "Peter Drucker"
+  },
+  {
+    text: "Everything begins with an idea. A single thought can transform your world.",
+    author: "Albert Einstein"
+  },
+  {
+    text: "Innovation distinguishes between a leader and a follower.",
+    author: "Steve Jobs"
+  },
+  {
+    text: "The only way to do great work is to love what you do.",
+    author: "Steve Jobs"
+  },
+  {
+    text: "Ideas are worthless until you get them out of your head and see what they can do.",
+    author: "Michael Dell"
+  },
+  {
+    text: "The biggest risk is not taking any risk. In a world that's changing quickly, the only strategy that is guaranteed to fail is not taking risks.",
+    author: "Mark Zuckerberg"
+  },
+  {
+    text: "Chase the vision, not the money; the money will end up following you.",
+    author: "Tony Hsieh"
+  },
+  {
+    text: "Your most unhappy customers are your greatest source of learning.",
+    author: "Bill Gates"
+  },
+  {
+    text: "Make every detail perfect and limit the number of details to perfect.",
+    author: "Jack Dorsey"
+  },
+  {
+    text: "The way to get started is to quit talking and begin doing.",
+    author: "Walt Disney"
+  },
+  {
+    text: "If you can dream it, you can do it.",
+    author: "Walt Disney"
   }
+];
 
+export default function LandingPage() {
   return (
-    <>
+    <div className="relative min-h-screen">
       <ParticleBackground />
-      <main className="h-[calc(100vh-64px)] container mx-auto px-4 py-4">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="max-w-md mx-auto"
-        >
-          <motion.div
-            className="bg-white/80 backdrop-blur-lg rounded-xl shadow-xl overflow-hidden"
-            whileHover={{ boxShadow: "0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)" }}
-            transition={{ duration: 0.2 }}
-          >
-            <form onSubmit={handleSubmit} className="p-8 space-y-6">
-              <AnimatedInput
-                type="email"
-                id="email"
-                name="email"
-                label="Email Address"
-                autoComplete="email"
-                value={values.email}
-                onChange={handleChange}
-                placeholder="your@email.com"
-                error={errors.email}
-                required
-              />
-              <AnimatedTextarea
-                id="idea"
-                name="idea"
-                label="Idea Description"
-                value={values.idea}
-                onChange={handleChange}
-                rows="5"
-                placeholder="Describe your business/project idea in detail (minimum 100 words)."
-                error={errors.idea}
-                required
-              />
-              <AnimatedButton
-                type="submit"
-                disabled={!isValid || isSubmitting}
-                isLoading={isSubmitting}
+      <div className="relative z-10">
+        <div className="h-screen overflow-hidden flex flex-col">
+          {/* Hero Section */}
+          <div className="flex-1 container mx-auto px-4 flex flex-col items-center justify-center">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8 }}
+              className="text-center relative w-full"
+            >
+              <motion.h1
+                initial={{ scale: 0.9 }}
+                animate={{ scale: 1 }}
+                transition={{ duration: 0.5 }}
+                className="text-5xl md:text-7xl font-bold mb-12 text-transparent bg-clip-text bg-gradient-to-r from-[#1a237e] to-[#1d4ed8]"
               >
-                Submit
-              </AnimatedButton>
-            </form>
-          </motion.div>
-        </motion.div>
-        {notification && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            className={`mt-4 p-4 rounded-xl text-center backdrop-blur-sm ${
-              notification.type === "success" 
-                ? "bg-green-100/80 text-green-700" 
-                : "bg-red-100/80 text-red-700"
-            }`}
-          >
-            {notification.message}
-          </motion.div>
-        )}
-      </main>
-    </>
+                Idea Evaluator
+              </motion.h1>
+
+              {/* Quotes Carousel */}
+              <div className="w-full overflow-hidden mb-12">
+                <div className="flex space-x-8 animate-scroll">
+                  {[...quotes, ...quotes, ...quotes].map((quote, index) => (
+                    <div
+                      key={index}
+                      className="flex-shrink-0 w-[400px] bg-white/80 backdrop-blur-sm rounded-xl shadow-md border border-[#2563eb]/20 p-4"
+                    >
+                      <div className="text-[#1a237e] mb-2">
+                        <FaQuoteLeft className="text-xl" />
+                      </div>
+                      <p className="text-gray-700 italic text-lg">{quote.text}</p>
+                      <p className="text-[#1a237e] text-sm mt-2">- {quote.author}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              
+              <motion.div
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <Link 
+                  href="/home"
+                  className="inline-block bg-[#1a237e] text-white px-8 py-4 rounded-full text-lg font-semibold 
+                             hover:bg-[#1d4ed8] transition-all duration-300 shadow-lg 
+                             hover:shadow-[#2563eb]/25 transform hover:-translate-y-1"
+                >
+                  Get Started
+                  <span className="ml-2">→</span>
+                </Link>
+              </motion.div>
+            </motion.div>
+
+            {/* Features Section */}
+            <div className="grid md:grid-cols-3 gap-8 mt-12">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.4, duration: 0.8 }}
+                className="bg-white/80 backdrop-blur-sm p-6 rounded-2xl shadow-lg border border-[#2563eb]/20 hover:border-[#2563eb]/40 hover:shadow-xl transition-all duration-300"
+              >
+                <div className="text-[#1a237e] text-3xl mb-3">
+                  <FaBrain />
+                </div>
+                <h3 className="text-lg font-semibold mb-2 text-gray-800">AI-Powered Analysis</h3>
+                <p className="text-gray-600 text-sm">Get comprehensive insights powered by advanced artificial intelligence</p>
+              </motion.div>
+
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.6, duration: 0.8 }}
+                className="bg-white/80 backdrop-blur-sm p-6 rounded-2xl shadow-lg border border-[#2563eb]/20 hover:border-[#2563eb]/40 hover:shadow-xl transition-all duration-300"
+              >
+                <div className="text-[#1a237e] text-3xl mb-3">
+                  <FaChartLine />
+                </div>
+                <h3 className="text-lg font-semibold mb-2 text-gray-800">Market Insights</h3>
+                <p className="text-gray-600 text-sm">Understand market potential and growth opportunities</p>
+              </motion.div>
+
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.8, duration: 0.8 }}
+                className="bg-white/80 backdrop-blur-sm p-6 rounded-2xl shadow-lg border border-[#2563eb]/20 hover:border-[#2563eb]/40 hover:shadow-xl transition-all duration-300"
+              >
+                <div className="text-[#1a237e] text-3xl mb-3">
+                  <FaRocket />
+                </div>
+                <h3 className="text-lg font-semibold mb-2 text-gray-800">Strategic Planning</h3>
+                <p className="text-gray-600 text-sm">Get actionable recommendations for success</p>
+              </motion.div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   )
 }
-
