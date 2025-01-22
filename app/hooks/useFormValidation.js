@@ -15,7 +15,24 @@ export default function useFormValidation(initialState) {
       }
 
       if (values.idea.split(/\s+/).length < 100) {
-        errors.idea = "Please enter at least 100 words for a thorough analysis"
+        errors.idea = `<div class="space-y-4">
+          <div>
+            Please provide a detailed description (minimum 100 words) including:
+            <br/>• Core concept and target audience
+            <br/>• Key features and functionalities
+            <br/>• Revenue model and pricing strategy
+            <br/>• Market analysis and competition
+            <br/>• Technical requirements
+          </div>
+
+          <div>
+            <strong>Note:</strong> The submit button will remain inactive until all criteria are met.
+          </div>
+
+          <div class="text-green-600">
+            <strong>Tip:</strong> If you're having trouble providing enough detail, you can use AI tools like ChatGPT. Simply share your basic idea with ChatGPT and ask it to expand it into a detailed description covering all the above points.
+          </div>
+        </div>`
       } else {
         const lowerCaseIdea = values.idea.toLowerCase()
         const keyAspects = {
@@ -30,7 +47,7 @@ export default function useFormValidation(initialState) {
           .map(([aspect]) => aspect)
 
         if (missingAspects.length > 0) {
-          errors.idea = `Consider including information about: ${missingAspects.join(', ')}`
+          errors.idea = `Please include information about: ${missingAspects.join(', ')}`
         }
       }
 

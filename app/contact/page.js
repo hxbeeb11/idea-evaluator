@@ -1,19 +1,15 @@
 "use client"
 
 import { useState } from "react"
-import useFormValidation from "./hooks/useFormValidation"
-import ParticleBackground from "./components/ParticleBackground"
+import ParticleBackground from "../components/ParticleBackground"
 import { motion } from "framer-motion"
-import { AnimatedInput, AnimatedTextarea, AnimatedButton } from "./components/AnimatedFormElements"
+import { AnimatedInput, AnimatedTextarea, AnimatedButton } from "../components/AnimatedFormElements"
 
-export default function Home() {
+export default function Contact() {
+  const [email, setEmail] = useState("")
+  const [message, setMessage] = useState("")
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [notification, setNotification] = useState(null)
-  const { values, errors, handleChange, isValid } = useFormValidation({
-    email: "",
-    idea: "",
-  })
-  const [analysis, setAnalysis] = useState(null)
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -21,48 +17,38 @@ export default function Home() {
     setNotification(null)
 
     try {
-      console.log('Submitting form with:', { email: values.email, idea: values.idea });  // Debug log
-      
-      const response = await fetch('/api/evaluate', {
+      const result = await fetch('/api/contact', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          email: values.email,
-          idea: values.idea,
-        }),
-      });
+        body: JSON.stringify({ email, message }),
+      })
 
-      console.log('Response received:', response.status);  // Debug log
-      
-      const data = await response.json();
-      console.log('Response data:', data);  // Debug log
-
-      if (data.success) {
-        setAnalysis(null);
+      if (result.ok) {
+        setEmail("")
+        setMessage("")
         setNotification({
           type: "success",
-          message: "Analysis complete! A comprehensive evaluation of your idea has been sent to your email. Please check your inbox for detailed analytical results and recommendations.",
-        });
+          message: "Your message has been sent successfully. We will reply to your email shortly."
+        })
       } else {
-        throw new Error(data.error);
+        throw new Error("Failed to send message")
       }
     } catch (error) {
-      console.error('Error in submission:', error);  // Debug log
       setNotification({
         type: "error",
-        message: "Error processing your request. Please try again.",
-      });
+        message: "Failed to send message. Please try again."
+      })
     } finally {
-      setIsSubmitting(false);
+      setIsSubmitting(false)
     }
   }
 
   return (
     <>
       <ParticleBackground />
-      <main className="h-[calc(100vh-64px)] container mx-auto px-4 py-4">
+      <main className="flex-grow container mx-auto px-4 py-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -78,32 +64,27 @@ export default function Home() {
               <AnimatedInput
                 type="email"
                 id="email"
-                name="email"
-                label="Email Address"
-                autoComplete="email"
-                value={values.email}
-                onChange={handleChange}
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                label="Your Email Address"
                 placeholder="your@email.com"
-                error={errors.email}
                 required
               />
               <AnimatedTextarea
-                id="idea"
-                name="idea"
-                label="Idea Description"
-                value={values.idea}
-                onChange={handleChange}
-                rows="5"
-                placeholder="Describe your business/project idea in detail (minimum 100 words)."
-                error={errors.idea}
+                id="message"
+                value={message}
+                onChange={(e) => setMessage(e.target.value)}
+                label="Message"
+                rows="4"
+                placeholder="Type your message here..."
                 required
               />
               <AnimatedButton
                 type="submit"
-                disabled={!isValid || isSubmitting}
+                disabled={isSubmitting}
                 isLoading={isSubmitting}
               >
-                Submit
+                Send Message
               </AnimatedButton>
             </form>
           </motion.div>
@@ -126,4 +107,3 @@ export default function Home() {
     </>
   )
 }
-
