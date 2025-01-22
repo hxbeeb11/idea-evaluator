@@ -39,6 +39,27 @@ export async function POST(request) {
         ]);
 
         const analysis = analysisResult.response.text();
+        console.log('Analysis response length:', analysis.length);
+        console.log('Analysis response end:', analysis.slice(-200));
+        
+        // Validate that all sections are present
+        const requiredSections = [
+          "1. Project Overview",
+          "2. Technical Requirements",
+          "3. Market Analysis",
+          "4. Financial Analysis",
+          "5. Implementation Challenges",
+          "6. Marketing Strategy",
+          "7. Growth & Scaling Strategy",
+          "8. Overall Score"
+        ];
+
+        const missingSection = requiredSections.find(section => !analysis.includes(section));
+        if (missingSection) {
+          console.warn(`Missing section detected: ${missingSection}`);
+          throw new Error('Incomplete analysis generated. Please try again.');
+        }
+        
         const visualDataText = visualDataResult.response.text();
         
         console.log('Analysis and visual data generated successfully');
@@ -147,95 +168,47 @@ export async function POST(request) {
 }
 
 // Analysis prompt template
-const analysisPrompt = `Provide an extensive and detailed evaluation of the following business/project idea. Your analysis should be thorough and insightful, covering all critical aspects as outlined in the sections below. Format your response in markdown.
+const analysisPrompt = `Provide a comprehensive evaluation of the following business/project idea. Format your response in markdown, ensuring each section is complete and concise.
 
 1. Project Overview
    - Core concept and value proposition
-   - Key features and functionalities
-   - Primary objectives and goals
-   - Potential impact in the market
+   - Key features and objectives
+   - Target market impact
 
 2. Technical Requirements
-   - Detailed technology stack needed
-   - Infrastructure requirements
-   - Development timeline estimation
-   - Security considerations
-   - Scalability requirements
-   - Third-party integrations needed
+   - Technology stack and infrastructure
+   - Development timeline
+   - Security and scalability needs
 
 3. Market Analysis
-   - Target Audience
-     * Detailed demographic breakdown
-     * User personas
-     * Pain points addressed
-     * User acquisition challenges
-   - Competition
-     * Direct competitors analysis
-     * Indirect competitors
-     * Competitive advantages and disadvantages
-     * Market positioning strategy
-   - Market Size
-     * Total Addressable Market (TAM)
-     * Serviceable Addressable Market (SAM)
-     * Market growth trends
-     * Regional market opportunities
+   - Target audience and demographics
+   - Competitor analysis
+   - Market size and growth potential
 
 4. Financial Analysis
-   - Initial Setup Costs
-     * Development costs
-     * Infrastructure setup
-     * Legal and compliance
-     * Marketing and branding
-   - Operational Costs
-     * Monthly running costs
-     * Staff requirements
-     * Marketing budget
-     * Customer support
-   - Revenue Streams
-     * Primary revenue models
-     * Pricing strategy analysis
-     * Revenue projections
-     * Break-even analysis
-   - Funding Requirements
-     * Initial capital needed
-     * Potential funding sources
-     * Investment timeline
+   - Setup and operational costs
+   - Revenue model and pricing
+   - Break-even analysis
+   - 5-year projections
 
 5. Implementation Challenges
-   - Technical challenges
+   - Technical and operational risks
    - Market entry barriers
-   - Regulatory compliance issues
-   - Operational challenges
-   - Risk assessment and mitigation strategies
+   - Risk mitigation strategies
 
 6. Marketing Strategy
-   - Brand Positioning
-     * Brand identity
-     * Value proposition
-     * Brand messaging
-   - Marketing Channels
-     * Digital marketing strategy
-     * Content marketing approach
-     * Social media strategy
-     * PR and partnerships
-   - Customer Acquisition
-     * User acquisition strategy
-     * Customer retention plans
-     * Growth hacking opportunities
-   - USP (Unique Selling Proposition)
-     * Key differentiators
-     * Competitive advantages
-     * Market positioning
+   - Brand positioning
+   - Marketing channels
+   - Customer acquisition plan
+   - Retention strategy
 
 7. Growth & Scaling Strategy
    - Short-term goals (6-12 months)
-   - Medium-term expansion (1-2 years)
+   - Medium-term plans (1-2 years)
    - Long-term vision (3-5 years)
-   - International expansion possibilities
-   - Potential pivots and adaptations
 
-8. Overall Score (1-10) with Detailed Justification
-   - Score breakdown by category
+8. Overall Score (1-10)
+   - Category scores
    - Key strengths
    - Areas for improvement
    - Final recommendation
